@@ -55,6 +55,8 @@ Samba::init()
     uint8_t cmd[3];
     uint32_t cid;
 
+    _port->initcmd();  
+
     _port->timeout(TIMEOUT_QUICK);
 
     // Allows Arduino auto-reset
@@ -587,5 +589,7 @@ Samba::reset(void)
     // This delay is here to give the time to kernel driver to
     // sort out things before closing the port.
     usleep(100000);
+
+	_port->endcmd();
 }
 

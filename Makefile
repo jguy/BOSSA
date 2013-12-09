@@ -37,7 +37,9 @@ ifeq ($(OS),MINGW32)
 EXE=.exe
 COMMON_SRCS+=WinSerialPort.cpp WinPortFactory.cpp
 COMMON_LDFLAGS=-Wl,--enable-auto-import -static -static-libstdc++ -static-libgcc
-COMMON_LIBS=-Wl,--as-needed -lsetupapi -ltermcap
+#COMMON_LDFLAGS=-Wl,--enable-auto-import -static -static-libgcc
+COMMON_LIBS=-Wl,--as-needed -lsetupapi -lncurses
+
 BOSSA_RC=BossaRes.rc
 WIXDIR="C:\Program Files (x86)\Windows Installer XML v3.5\bin"
 
@@ -78,7 +80,7 @@ endif
 # OS X rules
 #
 ifeq ($(OS),Darwin)
-COMMON_SRCS+=PosixSerialPort.cpp OSXPortFactory.cpp
+COMMON_SRCS+=OSXPosixSerialPort.cpp OSXPortFactory.cpp
 COMMON_CXXFLAGS=-arch i386
 COMMON_LDFLAGS=-arch i386
 APP=BOSSA.app
@@ -142,7 +144,7 @@ ARMOBJCOPY=$(ARM)objcopy
 #
 # CXX Flags
 #
-COMMON_CXXFLAGS+=-Wall -Werror -Wno-error=unused-but-set-variable -MT $@ -MD -MP -MF $(@:%.o=%.d) -DVERSION=\"$(VERSION)\" -g -O2
+COMMON_CXXFLAGS+=-Wall -Werror -MT $@ -MD -MP -MF $(@:%.o=%.d) -DVERSION=\"$(VERSION)\" -g -O2
 WX_CXXFLAGS:=$(shell wx-config --cxxflags --version=$(WXVERSION)) -DWX_PRECOMP -Wno-ctor-dtor-privacy -O2 -fno-strict-aliasing
 BOSSA_CXXFLAGS=$(COMMON_CXXFLAGS) $(WX_CXXFLAGS) 
 BOSSAC_CXXFLAGS=$(COMMON_CXXFLAGS)
@@ -168,7 +170,8 @@ BOSSASH_LIBS=-lreadline $(COMMON_LIBS)
 #
 # Main targets
 #
-all: $(BINDIR)/bossa$(EXE) $(BINDIR)/bossac$(EXE) $(BINDIR)/bossash$(EXE)
+# all: $(BINDIR)/bossa$(EXE) $(BINDIR)/bossac$(EXE) $(BINDIR)/bossash$(EXE)
+all: $(BINDIR)/bossac$(EXE)
 
 #
 # Common rules
