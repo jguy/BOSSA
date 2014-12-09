@@ -18,6 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "PosixSerialPort.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,7 +26,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <errno.h>
-#include <linux/serial.h>
+#include <serial.h>
 
 
 #include <sys/ioctl.h> 
@@ -101,75 +102,26 @@ PosixSerialPort::~PosixSerialPort()
 bool
 PosixSerialPort::initcmd()
 {
-	int i, a, b, outbit;
-	int auth_token = 0xA5A5;
+    int ret;
+    
+    system("echo 117 > /sys/class/gpio/export");
+    system("echo 0 > /sys/class/gpio/export"); 
+    ret = system("echo \"out\" > /sys/class/gpio/gpio117/direction");
+    ret = system("echo 1 > /sys/class/gpio/gpio117/value");
+    usleep(300000);
+    ret = system("echo \"in\" > /sys/class/gpio/gpio117/direction");
+    ret = system("echo \"out\" > /sys/class/gpio/gpio0/direction");
+    ret = system("echo 0 > /sys/class/gpio/gpio0/value");
+    usleep(100000);
+    ret = system("echo 1 > /sys/class/gpio/gpio0/value");
 
-        std::string dev("/dev/");
-        dev += _name;
-        _devfd = ::open(dev.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-        if (_devfd == -1)
-            return false;
-
-  	setdtr(_devfd, 0); // DAT
-
-	for (a=0; a< 10; a++) {
-	  for (i=0; i<16; i++) {
-	   outbit = (auth_token >> i) & 0x01;
- 	   setdtr(_devfd, outbit); // DAT 1
-	   usleep(10);
-	   setrts(_devfd, 0); // CLK
-	   usleep(10);
-	   setrts(_devfd, 1); // CLK
-	  }
-
-	  // Now sending reset code sequence [1111]:
-	  for (b=0; b<4; b++) {
- 	    setdtr(_devfd, 0); // DAT 1
-	    usleep(10);
-	    setrts(_devfd, 0); // CLK
-	    usleep(10);
-	    setrts(_devfd, 1); // CLK
-	  }
-	  // End of 4 bit code sequence;
-
- 	   usleep(100);
-	}
-//        ::close(_devfd);
-        return true;
+    return true;
 }
 
 bool
 PosixSerialPort::endcmd()
 {
-	int i, a, b, outbit;
-	int auth_token = 0xA5A5;
-
-  	setdtr(_devfd, 0); // DAT
-
-	for (a=0; a< 10; a++) {
-	  for (i=0; i<16; i++) {
-	   outbit = (auth_token >> i) & 0x01;
- 	   setdtr(_devfd, outbit); // DAT 1
-	   usleep(10);
-	   setrts(_devfd, 0); // CLK
-	   usleep(10);
-	   setrts(_devfd, 1); // CLK
-	  }
-
-	  // Now sending reset code sequence [0000]:
-	  for (b=0; b<4; b++) {
- 	    setdtr(_devfd, 1); // DAT 1
-	    usleep(10);
-	    setrts(_devfd, 0); // CLK
-	    usleep(10);
-	    setrts(_devfd, 1); // CLK
-	  }
-	  // End of 4 bit code sequence;
-
- 	   usleep(100);
-	}
-//        ::close(_devfd);
-        return true;
+      return true;
 }
 
 
