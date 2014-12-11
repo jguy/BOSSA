@@ -591,5 +591,6 @@ Samba::reset(void)
     usleep(100000);
 
 	_port->endcmd();
+    _port->close();
 }
 
